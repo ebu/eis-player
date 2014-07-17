@@ -1,42 +1,42 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>EURORADIO International Signal</title>
-		
-		<style>
-      body{
-        font-family: verdana;
-        font-size:13px;
-        margin: 0px;
-        padding: 0px;
-      }
+<head>
+  <title>EURORADIO International Signal</title>
 
-      .radiovis-main {
-        border: 1px #C5C5C2 solid;
-      }
+  <style>
+    body{
+      font-family: verdana;
+      font-size:13px;
+      margin: 0px;
+      padding: 0px;
+    }
 
-      .radiovis-textframe {
-        border-top: 1px #C5C5C2 solid;
-      }
+    .radiovis-main {
+      border: 1px #C5C5C2 solid;
+    }
 
-      .frame {
-        float: left;
-      }
-    </style>
+    .radiovis-textframe {
+      border-top: 1px #C5C5C2 solid;
+    }
 
-    <link rel="stylesheet" href="css/radiovis-html5player.css">
+    .frame {
+      float: left;
+    }
+  </style>
 
-    <script src="js/jquery-1.10.2.min.js"></script>
-    <script src="js/radiovis-html5player.js"></script>
-		
-	</head>
-	<body>
-		<script>
-				$(document).ready(function(){
-					$('#vis-player').radiovisplayer('/topic/dab/4e1/4fff/4001/0', 'eis-edge.ebu.io');
-				});
-		</script>
+  <link rel="stylesheet" href="css/radiovis-html5player.css">
 
-    <div id="vis-player" class="frame"></div>
-	</body>
+  <script src="js/jquery-1.10.2.min.js"></script>
+  <script src="js/radiovis-html5player.js"></script>
+
+</head>
+<body>
+  <script>
+    $(document).ready(function(){
+      $('#vis-player').radiovisplayer('/topic/dab/4e1/4fff/4001/0', 'eis-edge.ebu.io');
+    });
+  </script>
+
+  <div id="vis-player" class="frame"></div>
+</body>
 </html>

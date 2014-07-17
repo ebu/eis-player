@@ -3,184 +3,184 @@ var radiovisplayer_websockets = new Array();
 
 function radiovisplayer_initsocket(topic, host, port) {
 
-	ws = new WebSocket("ws://" + host + ":" + port + topic);
+  ws = new WebSocket("ws://" + host + ":" + port + topic);
 
-	// Save data for reconnection
-	ws.radiovis_topic = topic;
-	ws.radiovis_host = host;
-	ws.radiovis_port = port;
+  // Save data for reconnection
+  ws.radiovis_topic = topic;
+  ws.radiovis_host = host;
+  ws.radiovis_port = port;
 
-	var elem = $('.radiovis-main[radiovis-topic="' + topic + '"]');
+  var elem = $('.radiovis-main[radiovis-topic="' + topic + '"]');
   elem.find('.radiovis-outtertext').hide();
-	elem.find('.radiovis-innertext').html('Connecting to ' + topic + '...');
+  elem.find('.radiovis-innertext').html('Connecting to ' + topic + '...');
 
-	var radiovisplayer_connected_message = 'Connected, waiting for the first message !';
+  var radiovisplayer_connected_message = 'Connected, waiting for the first message !';
 
-	ws.onmessage = function (evt) 
-	{ 
-		var elem = $('.radiovis-main[radiovis-topic="' + evt.target.radiovis_topic + '"]');
-		
+  ws.onmessage = function (evt)
+  {
+    var elem = $('.radiovis-main[radiovis-topic="' + evt.target.radiovis_topic + '"]');
 
-		message = evt.data;
-		splited_message = message.split(':');
 
-		if (splited_message[0] == 'RADIOVISWEBSOCKET') {  // Internal message
-			if (splited_message[1] == 'HELLO\x00') {
-				elem.find('.radiovis-innertext').html(radiovisplayer_connected_message);
-				return;
-			}
-			if (splited_message[1] == 'ERROR') {
-				elem.find('.radiovis-innertext').html('<span style="color: red;">Error: ' + splited_message[2] + '</span>');
-				return;
-			}
+    message = evt.data;
+    splited_message = message.split(':');
 
-			elem.find('.radiovis-innertext').html('<span style="color: red;">Unexcepted reply: ' + splited_message[1] + '</span>');
-		} else {
-			command = '';
-			headers = new Array();
-			body = '';
-			headerMode = true;
+    if (splited_message[0] == 'RADIOVISWEBSOCKET') {  // Internal message
+      if (splited_message[1] == 'HELLO\x00') {
+        elem.find('.radiovis-innertext').html(radiovisplayer_connected_message);
+        return;
+      }
+      if (splited_message[1] == 'ERROR') {
+        elem.find('.radiovis-innertext').html('<span style="color: red;">Error: ' + splited_message[2] + '</span>');
+        return;
+      }
 
-			data = evt.data.split('\n');
-			if (data[0] != '') {
-				command = data[0];
-				start = 1;
-			} else {
-				command = data[1];
-				start = 2;
-			}
+      elem.find('.radiovis-innertext').html('<span style="color: red;">Unexcepted reply: ' + splited_message[1] + '</span>');
+    } else {
+      command = '';
+      headers = new Array();
+      body = '';
+      headerMode = true;
 
-			for(var i = start; i < data.length; i++) {
-				if (data[i] == '' && headerMode) {  // Switch from headers to body
-					headerMode = false;
-				} else if (headerMode) {  // Add header to the list
-					sdata = data[i].split(':', 1);
-					headers[sdata[0]] = data[i].substr(sdata[0].length+1);
-				} else {  // Compute the body
-					body += data[i] + '\n';
-				}
-			}
+      data = evt.data.split('\n');
+      if (data[0] != '') {
+        command = data[0];
+        start = 1;
+      } else {
+        command = data[1];
+        start = 2;
+      }
 
-			// Remove the last \n
-			body = body.substr(0, body.length-1);
+      for(var i = start; i < data.length; i++) {
+        if (data[i] == '' && headerMode) {  // Switch from headers to body
+          headerMode = false;
+        } else if (headerMode) {  // Add header to the list
+          sdata = data[i].split(':', 1);
+          headers[sdata[0]] = data[i].substr(sdata[0].length+1);
+        } else {  // Compute the body
+          body += data[i] + '\n';
+        }
+      }
 
-			//Is it a message ?
-			if (command == 'MESSAGE') {
+      // Remove the last \n
+      body = body.substr(0, body.length-1);
 
-				//Is it for text ?
-				if (headers['destination']  == evt.target.radiovis_topic + '/text') {
-					//Do we have to show text ?
-					if (body.substr(0, 5) == 'TEXT ') {
-						newText = body.substr(5);
+      //Is it a message ?
+      if (command == 'MESSAGE') {
 
-						elem.find('.radiovis-innertext').text(newText);
-					}
-				}
+        //Is it for text ?
+        if (headers['destination']  == evt.target.radiovis_topic + '/text') {
+          //Do we have to show text ?
+          if (body.substr(0, 5) == 'TEXT ') {
+            newText = body.substr(5);
 
-				//Is it for images ?
-				if (headers['destination']  == evt.target.radiovis_topic + '/image') {
-					//Do we have to show an image ?
-					if (body.substr(0, 5) == 'SHOW ') {
+            elem.find('.radiovis-innertext').text(newText);
+          }
+        }
 
-						//FInd the image to use						
-						if (elem.attr('lastImageShown'))
-							lastShow = elem.attr('lastImageShown');
-						else 
-							lastShow = '1';
+        //Is it for images ?
+        if (headers['destination']  == evt.target.radiovis_topic + '/image') {
+          //Do we have to show an image ?
+          if (body.substr(0, 5) == 'SHOW ') {
 
-						toShow = 1 - lastShow;
+            //FInd the image to use
+            if (elem.attr('lastImageShown'))
+              lastShow = elem.attr('lastImageShown');
+            else
+              lastShow = '1';
 
-						//Set the src
-						elem.find('.radiovis-I' + toShow).attr('src', body.substr(5));
+            toShow = 1 - lastShow;
 
-						//Nice effect
-						if(toShow == 1) {
-							elem.find('.radiovis-I0').hide();
-							elem.find('.radiovis-I1').fadeIn(1000);
-						}
-						else {
-							elem.find('.radiovis-I0').fadeIn(1000);
-							elem.find('.radiovis-I1').hide();
-						}
+            //Set the src
+            elem.find('.radiovis-I' + toShow).attr('src', body.substr(5));
 
-						elem.attr('lastImageShown', toShow);
+            //Nice effect
+            if(toShow == 1) {
+              elem.find('.radiovis-I0').hide();
+              elem.find('.radiovis-I1').fadeIn(1000);
+            }
+            else {
+              elem.find('.radiovis-I0').fadeIn(1000);
+              elem.find('.radiovis-I1').hide();
+            }
 
-						//Some radio dosen't send text. If we're still on the default message, remove it
-						if (elem.find('.radiovis-innertext').html() == radiovisplayer_connected_message)
-							elem.find('.radiovis-innertext').html('');
+            elem.attr('lastImageShown', toShow);
 
-						//Update link
-						if (headers['link'])
-							elem.find('a').attr('href', headers['link']);
-						else
-							elem.find('a').attr('href', '#');
-					}
-				}
-			}
+            //Some radio dosen't send text. If we're still on the default message, remove it
+            if (elem.find('.radiovis-innertext').html() == radiovisplayer_connected_message)
+              elem.find('.radiovis-innertext').html('');
 
-		}
-	};
+            //Update link
+            if (headers['link'])
+              elem.find('a').attr('href', headers['link']);
+            else
+              elem.find('a').attr('href', '#');
+          }
+        }
+      }
 
-	ws.onclose = function(evt)
-	{ 
-		var elem = $('.radiovis-main[radiovis-topic="' + evt.target.radiovis_topic + '"]');
-		elem.find('.radiovis-textframe').html('Connexion lost, reconnecting...');
+    }
+  };
+
+  ws.onclose = function(evt)
+  {
+    var elem = $('.radiovis-main[radiovis-topic="' + evt.target.radiovis_topic + '"]');
+    elem.find('.radiovis-textframe').html('Connexion lost, reconnecting...');
 
     var retryIn = (5000 + Math.random() * 10000);
-		setTimeout("radiovisplayer_initsocket('" + evt.target.radiovis_topic + "', '" + evt.target.radiovis_host + "', " + evt.target.radiovis_port + ");", retryIn);
-	};
+    setTimeout("radiovisplayer_initsocket('" + evt.target.radiovis_topic + "', '" + evt.target.radiovis_host + "', " + evt.target.radiovis_port + ");", retryIn);
+  };
 
-	radiovisplayer_websockets[topic] = ws;
+  radiovisplayer_websockets[topic] = ws;
 }
 
 (function( $ ) {
-	$.fn.radiovisplayer = function(topic, host, port) {
+  $.fn.radiovisplayer = function(topic, host, port) {
 
-		if (host == undefined)
-			host = window.location.hostname;
-		if (port == undefined)
-			port = 8777;
+    if (host == undefined)
+      host = window.location.hostname;
+    if (port == undefined)
+      port = 8777;
 
-		var frame = '<div class="radiovis-mainframe">';
-		frame +=    '    <div class="radiovis-slideframe"';
-		frame +=    '        <div class="radiovis-P1"><a href="" class="radiovis-LI"><img class="radiovis-I1" src="' + radiovisplayer_first_image + '"></a></div>';
-		frame +=    '        <div class="radiovis-P0"><a href="" class="radiovis-LI"><img class="radiovis-I0" src="' + radiovisplayer_first_image + '"></a></div>';
-		frame +=    '    </div>';
-		frame +=    '</div>';
-		frame +=    '<div class="radiovis-outtertext"><div class="radiovis-innertext">Initlialization...</div></div>';
+    var frame = '<div class="radiovis-mainframe">';
+    frame +=    '    <div class="radiovis-slideframe"';
+    frame +=    '        <div class="radiovis-P1"><a href="" class="radiovis-LI"><img class="radiovis-I1" src="' + radiovisplayer_first_image + '"></a></div>';
+    frame +=    '        <div class="radiovis-P0"><a href="" class="radiovis-LI"><img class="radiovis-I0" src="' + radiovisplayer_first_image + '"></a></div>';
+    frame +=    '    </div>';
+    frame +=    '</div>';
+    frame +=    '<div class="radiovis-outtertext"><div class="radiovis-innertext">Initlialization...</div></div>';
 
-		//Add the frame
-		this.html(frame);
+    //Add the frame
+    this.html(frame);
 
-		//Add properties
-		this.attr('radiovis-topic', topic);
-		this.addClass('radiovis-main');
+    //Add properties
+    this.attr('radiovis-topic', topic);
+    this.addClass('radiovis-main');
 
-		//Scroll text
-		this.find('.radiovis-outtertext').bind('scrollage', function() {
-			var boxWidth = $(this).width();
-			var textWidth = $(this).find('.radiovis-innertext').width();
+    //Scroll text
+    this.find('.radiovis-outtertext').bind('scrollage', function() {
+      var boxWidth = $(this).width();
+      var textWidth = $(this).find('.radiovis-innertext').width();
 
-			var finalPos =  textWidth - boxWidth;
+      var finalPos =  textWidth - boxWidth;
 
-			if (finalPos < 0)
-				finalPos = 0;
+      if (finalPos < 0)
+        finalPos = 0;
 
-			var animSpeed = finalPos * 20;
+      var animSpeed = finalPos * 20;
 
-			if (animSpeed == 0)
-				animSpeed = 1000;
+      if (animSpeed == 0)
+        animSpeed = 1000;
 
-			$(this)
-				.animate({scrollLeft: finalPos}, {duration : animSpeed})
-				.animate({scrollLeft: 0}, {duration : animSpeed, queue: true, complete: function() {
-					$(this).trigger('scrollage');
-				}
-			});
-		}).trigger('scrollage');
+      $(this)
+          .animate({scrollLeft: finalPos}, {duration : animSpeed})
+          .animate({scrollLeft: 0}, {duration : animSpeed, queue: true, complete: function() {
+            $(this).trigger('scrollage');
+          }
+          });
+    }).trigger('scrollage');
 
-		radiovisplayer_initsocket(topic, host, port);		
-		
-		return this;
-	};
+    radiovisplayer_initsocket(topic, host, port);
+
+    return this;
+  };
 }( jQuery ));
