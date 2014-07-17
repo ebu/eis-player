@@ -1,10 +1,10 @@
-eis-player
+EURORADIO International Signal - VIS Player
 ==========
 
-This archive file contains a static RadioVIS player. It is a jQuery component that can be integrated in any page using jQuery.
+This archive file contains a static RadioVIS player. It is a jQuery component that can be integrated in any page using jQuery or simply by using the iframe.
 It has been tested against jquery 10.2. The project is split in two folders:
 
-* `component` contains a self-explanatory example of integration.
+* `component` contains a self-explanatory example of embeding the jQuery component.
 * `iframe` contains an example of integration using an iframe.
 
 Do not hesitate to contact Mathias Coinchon (coinchon@ebu.ch) and Michael Barroco (barroco@ebu.ch) if you need further information.
@@ -14,9 +14,10 @@ The radioVIS player opens a websocket connection to `eis-edge.ebu.io` and subscr
 If there is no picture is available, a generic event image (Blue track in the background) will be displayed.
 
 ### Debug
-
 When using Chrome or any other in-browser debugger, typing `$('.radiovis-outtertext').show()` in the console will display the RadioText and a red message in case of error
 
+### Issues
+Please use the issue tracker to capture any comment or feedback.
 
 ## Related project
 
