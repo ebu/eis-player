@@ -143,8 +143,8 @@ function radiovisplayer_initsocket(topic, host, port) {
 
     var frame = '<div class="radiovis-mainframe">';
     frame +=    '    <div class="radiovis-slideframe"';
-    frame +=    '        <div class="radiovis-P1"><a href="" class="radiovis-LI"><img class="radiovis-I1" src="' + radiovisplayer_first_image + '"></a></div>';
-    frame +=    '        <div class="radiovis-P0"><a href="" class="radiovis-LI"><img class="radiovis-I0" src="' + radiovisplayer_first_image + '"></a></div>';
+    frame +=    '        <div class="radiovis-P1"><a href="" target="_blank" class="radiovis-LI"><img class="radiovis-I1" src="' + radiovisplayer_first_image + '"></a></div>';
+    frame +=    '        <div class="radiovis-P0"><a href="" target="_blank" class="radiovis-LI"><img class="radiovis-I0" src="' + radiovisplayer_first_image + '"></a></div>';
     frame +=    '    </div>';
     frame +=    '</div>';
     frame +=    '<div class="radiovis-outtertext"><div class="radiovis-innertext">Initlialization...</div></div>';
