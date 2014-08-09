@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EURORADIO International Signal</title>
+
+  <style>
+    body{
+      font-family: verdana;
+      font-size:13px;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .radiovis-main {
+      border: 0px;
+    }
+
+    .radiovis-textframe {
+      border-top: 0px;
+    }
+
+    .frame {
+      float: left;
+    }
+  </style>
+
+  <link rel="stylesheet" href="css/radiovis-html5player.css">
+
+  <script src="../js/jquery-1.10.2.min.js"></script>
+  <script src="../js/radiovis-html5player.js"></script>
+
+</head>
+<body>
+  <script>
+    $(document).ready(function(){
+      $('#vis-player').radiovisplayer('/topic/dab/4e1/4fff/4013/0', 'eis-edge.ebu.io');
+    });
+  </script>
+
+  <div id="vis-player" class="frame"></div>
+</body>
+</html>
